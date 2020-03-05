@@ -20,6 +20,3 @@ def getSortedArray(n):
         result[i] = n-i
 
     return result
-
-
-print(getSortedArray(5))
