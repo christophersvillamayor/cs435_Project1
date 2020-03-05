@@ -10,6 +10,7 @@ def insertIter(root, node):
     if root is None:
         root = node
 
+    count = 0
     curr = root
     parent = None
     while curr is not None:
@@ -18,6 +19,7 @@ def insertIter(root, node):
             curr = curr.right
         else:
             curr = curr.left
+        count += 1
 
     if node.val > parent.val:
         parent.right = node
@@ -26,35 +28,69 @@ def insertIter(root, node):
         parent.left = node
         parent.left.parent = parent
 
+    print("bstIt: " + str(count))
+
 
 def deleteIter(root, val):
     curr = root
 
+    # Find val
     while curr.val != val:
         if val > curr.val:
             curr = curr.right
         else:
             curr = curr.left
 
-    # One child
-    if curr.left is None and curr.right is not None:
-        temp = curr.right
-        curr.right = None
-        return temp
-    elif curr.left is not None and curr.right is None:
-        temp = curr.left
-        curr.left = None
-        return temp
+    # No right child
+    if curr.right is None:
+        # Has a left child
+        if curr == curr.parent.left:
+            curr.parent.left = curr.left
+            curr.left.val = None
+            curr.left = None
+        else:
+            curr.parent.left.val = None
+            curr.parent.left = None
+    else:
+        # Has a right child
+        # Find node to swap and swap its vals
+        nextNode = findNextIter(curr)
 
-    # Two children
-    temp = findMinIter(curr.right)
-    curr.val = temp.val
+        temp = curr.val
+        curr.val = nextNode.val
+        nextNode.val = temp
 
-    # Delete after swap
-    curr = curr.right
-    while curr.left is not None:
-        curr = curr.left
-    curr = None
+        # Find node that we just swapped
+        curr = curr.right
+        while curr.val != val:
+            if val > curr.val:
+                curr = curr.right
+            else:
+                curr = curr.left
+
+        # Delete curr
+
+        # if the node we're deleting has a right child
+        if curr.right is not None:
+            # replacing left child of parent
+            if curr == curr.parent.left:
+                curr.parent.left = curr.right
+                curr.right.val = None
+                curr.right = None
+            # replacing right child of parent
+            elif curr == curr.parent.right:
+                curr.parent.right = curr.right
+                curr.right.val = None
+                curr.right = None
+        # No children
+        else:
+            # deleting parent's left child
+            if curr == curr.parent.left:
+                curr.parent.left.val = None
+                curr.parent.left = None
+            else:
+                curr.parent.right.val = None
+                curr.parent.right = None
 
 
 def findNextIter(node):
